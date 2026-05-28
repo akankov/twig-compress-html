@@ -94,6 +94,27 @@ final class AkankovTwigCompressHtmlBundleTest extends TestCase
         self::assertStringContainsString('<!-- kept -->', $rendered);
     }
 
+    public function testMinifyInlineCssTrueMinifiesStyleBlock(): void
+    {
+        $twig = $this->bootTwig(['minify_inline_css' => true]);
+        $rendered = $twig->createTemplate(
+            '{% htmlmin %}<style>a { color: red; /* x */ }</style>{% endhtmlmin %}',
+        )->render();
+
+        self::assertStringContainsString('<style>a{color:red}</style>', $rendered);
+    }
+
+    public function testMinifyInlineJsTrueMinifiesScriptBlock(): void
+    {
+        $twig = $this->bootTwig(['minify_inline_js' => true]);
+        $rendered = $twig->createTemplate(
+            '{% htmlmin %}<script>// gone' . "\n" . 'let x = 1;</script>{% endhtmlmin %}',
+        )->render();
+
+        self::assertStringNotContainsString('// gone', $rendered);
+        self::assertStringContainsString('let x = 1;', $rendered);
+    }
+
     /**
      * @param array<string, bool|null> $bundleConfig
      */
