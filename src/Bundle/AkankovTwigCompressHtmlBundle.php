@@ -23,6 +23,8 @@ final class AkankovTwigCompressHtmlBundle extends AbstractBundle
         'optimize_attributes' => 'doOptimizeAttributes',
         'sort_html_attributes' => 'doSortHtmlAttributes',
         'remove_omitted_quotes' => 'doRemoveOmittedQuotes',
+        'minify_inline_css' => 'doMinifyInlineCss',
+        'minify_inline_js' => 'doMinifyInlineJs',
     ];
 
     public function configure(DefinitionConfigurator $definition): void

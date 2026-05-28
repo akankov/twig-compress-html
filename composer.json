@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": "8.3.* || 8.4.* || 8.5.*",
-        "akankov/html-min": "^2.0",
+        "akankov/html-min": "^2.6",
         "twig/twig": "^3.0"
     },
     "require-dev": {

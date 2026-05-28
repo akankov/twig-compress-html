@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `minify_inline_css` and `minify_inline_js` bundle config keys, mapping to the
+  `doMinifyInlineCss()` / `doMinifyInlineJs()` toggles in `akankov/html-min`.
+  Both default to off; set to `true` to minify the contents of inline `<style>`
+  / `<script>` blocks captured by the `{% htmlmin %}` tag or `html_min` filter.
+  Requires `akankov/html-min` ^2.6.
+
 ## [1.0.0] — 2026-05-01
 
 ### Added
