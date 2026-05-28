@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-28
+
+Exposes the opt-in inline CSS/JS minification toggles added in
+`akankov/html-min` 2.6 through the bundle config. Released from PR
+[#2](https://github.com/akankov/twig-compress-html/pull/2).
+
 ### Added
 
 - `minify_inline_css` and `minify_inline_js` bundle config keys, mapping to the
