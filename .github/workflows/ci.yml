@@ -46,6 +46,34 @@ jobs:
       - name: Run PHPUnit
         run: vendor/bin/phpunit
 
+  coverage:
+    name: Line coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: pcov
+          extensions: dom, libxml, mbstring
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/composer
+          key: composer-coverage-${{ hashFiles('composer.json') }}
+          restore-keys: composer-coverage-
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run PHPUnit with coverage and enforce the floor
+        run: make coverage
+
   static-analysis:
     name: PHPStan (level max)
     runs-on: ubuntu-latest

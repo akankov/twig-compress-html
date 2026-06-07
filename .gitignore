@@ -2,6 +2,9 @@
 /vendor/
 /composer.lock
 
+# build artifacts (coverage reports)
+/build/
+
 # php tooling caches
 /.phpstan.cache/
 /.phpunit.cache/

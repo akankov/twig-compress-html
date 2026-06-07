@@ -12,8 +12,14 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Twig\Environment;
 
 final class AkankovTwigCompressHtmlBundleTest extends TestCase
@@ -116,25 +122,141 @@ final class AkankovTwigCompressHtmlBundleTest extends TestCase
     }
 
     /**
-     * @param array<string, bool|null> $bundleConfig
+     * `remove_omitted_html_tags` is one of the options the bundle did not expose
+     * before full parity. The engine default is `true`, so setting it `false`
+     * and seeing the optional closing tags survive proves the key is now wired
+     * through to MinifierOptions.
+     */
+    public function testPreviouslyUnexposedOptionIsHonored(): void
+    {
+        $twig = $this->bootTwig(['remove_omitted_html_tags' => false]);
+        $rendered = $twig->createTemplate(
+            '{% htmlmin %}<ul><li>a</li><li>b</li></ul>{% endhtmlmin %}',
+        )->render();
+
+        self::assertStringContainsString('</li>', $rendered);
+    }
+
+    /**
+     * Safety net for the camelize() -> named-argument contract: an invalid
+     * MinifierOptions argument name would make the container fail to compile.
+     * Setting every exposed option (booleans + list values) at once asserts the
+     * whole surface is accepted and the resolved minifier still works.
+     */
+    public function testEveryOptionIsAcceptedAndMinifies(): void
+    {
+        $twig = $this->bootTwig([
+            'optimize_via_html_dom_parser' => true,
+            'optimize_attributes' => true,
+            'remove_comments' => true,
+            'remove_whitespace_around_tags' => true,
+            'remove_omitted_quotes' => true,
+            'remove_omitted_html_tags' => true,
+            'remove_http_prefix_from_attributes' => true,
+            'remove_https_prefix_from_attributes' => true,
+            'keep_http_and_https_prefix_on_external_attributes' => true,
+            'sort_css_class_names' => true,
+            'sort_html_attributes' => true,
+            'remove_deprecated_script_charset_attribute' => true,
+            'remove_default_attributes' => true,
+            'remove_deprecated_anchor_name' => true,
+            'remove_deprecated_type_from_stylesheet_link' => true,
+            'remove_deprecated_type_from_style_and_link_tag' => true,
+            'remove_default_media_type_from_style_and_link_tag' => true,
+            'remove_default_type_from_button' => true,
+            'remove_deprecated_type_from_script_tag' => true,
+            'remove_value_from_empty_input' => true,
+            'remove_empty_attributes' => true,
+            'sum_up_whitespace' => true,
+            'remove_spaces_between_tags' => true,
+            'keep_broken_html' => false,
+            'minify_inline_css' => true,
+            'minify_inline_js' => true,
+            'local_domains' => ['example.com'],
+            'special_html_comments_starting_with' => ['[if'],
+            'special_html_comments_ending_with' => ['[endif]'],
+            'special_script_tags' => ['text/template'],
+            'template_logic_syntax_in_special_script_tags' => ['{{'],
+        ]);
+
+        $rendered = $twig->createTemplate(
+            '{% htmlmin %}<html>  <body>x</body>  </html>{% endhtmlmin %}',
+        )->render();
+
+        self::assertStringContainsString('<body>x', $rendered);
+        self::assertStringNotContainsString('  ', $rendered);
+    }
+
+    /**
+     * `minify_responses: true` must wire the kernel.response listener so a
+     * dispatched text/html response comes back minified. Dispatching through
+     * the container-built dispatcher (rather than introspecting it) proves the
+     * opt-in wiring end-to-end and is robust to debug listener wrapping.
+     */
+    public function testMinifyResponsesTrueRegistersResponseListener(): void
+    {
+        $response = new Response('<html>  <body>hi</body>  </html>', 200, ['Content-Type' => 'text/html']);
+        $this->dispatchResponse(['minify_responses' => true], $response);
+
+        self::assertStringNotContainsString('  ', (string) $response->getContent());
+        self::assertStringContainsString('<body>hi', (string) $response->getContent());
+    }
+
+    public function testResponseListenerIsNotRegisteredByDefault(): void
+    {
+        $body = '<html>  <body>hi</body>  </html>';
+        $response = new Response($body, 200, ['Content-Type' => 'text/html']);
+        $this->dispatchResponse([], $response);
+
+        self::assertSame($body, (string) $response->getContent());
+    }
+
+    /**
+     * @param array<string, mixed> $bundleConfig
+     */
+    private function dispatchResponse(array $bundleConfig, Response $response): void
+    {
+        $dispatcher = $this->bootContainer($bundleConfig)->get('event_dispatcher');
+        self::assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
+
+        $event = new ResponseEvent(
+            $this->createStub(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $response,
+        );
+        $dispatcher->dispatch($event, KernelEvents::RESPONSE);
+    }
+
+    /**
+     * @param array<string, mixed> $bundleConfig
      */
     private function bootTwig(array $bundleConfig): Environment
+    {
+        $twig = $this->bootContainer($bundleConfig)->get('twig');
+        self::assertInstanceOf(Environment::class, $twig);
+
+        return $twig;
+    }
+
+    /**
+     * @param array<string, mixed> $bundleConfig
+     */
+    private function bootContainer(array $bundleConfig): ContainerInterface
     {
         $kernel = new TestKernel(self::$tmp, $bundleConfig);
         $kernel->boot();
         $testContainer = $kernel->getContainer()->get('test.service_container');
         self::assertInstanceOf(ContainerInterface::class, $testContainer);
-        $twig = $testContainer->get('twig');
-        self::assertInstanceOf(Environment::class, $twig);
 
-        return $twig;
+        return $testContainer;
     }
 }
 
 final class TestKernel extends Kernel
 {
     /**
-     * @param array<string, bool|null> $bundleConfig
+     * @param array<string, mixed> $bundleConfig
      */
     public function __construct(
         private readonly string $projectDir,

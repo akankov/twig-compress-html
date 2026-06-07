@@ -4,9 +4,9 @@ A Twig 3 extension wrapping [`akankov/html-min`](https://packagist.org/packages/
 
 ## Requirements
 
-- PHP `^8.3`
+- PHP `8.3.* || 8.4.* || 8.5.*`
 - `twig/twig` `^3.0`
-- `akankov/html-min` `^1.0`
+- `akankov/html-min` `^2.8`
 
 ## Install
 
@@ -71,17 +71,55 @@ akankov_twig_compress_html:
     optimize_attributes: true
     sort_html_attributes: true
     remove_omitted_quotes: false
+    minify_inline_css: true
+    local_domains: ['example.com']
 ```
 
-Any key you omit leaves the upstream `HtmlMin` default in place — the bundle only calls a setter when you set the corresponding key.
-
 The filter and tag become available in all templates automatically.
+
+### Configuration
+
+Every config key is a snake_case mirror of a property on
+`Akankov\HtmlMin\Config\MinifierOptions`; the bundle camel-cases them and builds
+the options object that backs the shared `HtmlMin` service, so:
+
+```yaml
+remove_comments: true       # → MinifierOptions::$removeComments
+sum_up_whitespace: true     # → MinifierOptions::$sumUpWhitespace
+local_domains: ['a.test']   # → MinifierOptions::$localDomains
+```
+
+All of the engine's options are accepted — the 26 boolean toggles plus the list
+options `local_domains`, `special_html_comments_starting_with`,
+`special_html_comments_ending_with`, `special_script_tags`, and
+`template_logic_syntax_in_special_script_tags`. Any key you omit falls through
+to the engine's own default, so the bundle never pins (or drifts from) those
+defaults. This matches the surface exposed by the Laravel binding's
+`config/htmlmin.php`.
+
+### Response minification (opt-in)
+
+To minify whole `text/html` responses — not just `{% htmlmin %}` blocks — enable
+the `kernel.response` listener. It is **off by default** (the bundle never adds
+it to the response pipeline on its own), mirroring the Laravel binding's
+`MinifyHtmlResponseMiddleware`:
+
+```yaml
+akankov_twig_compress_html:
+    minify_responses: true
+```
+
+Sub-requests, streamed responses, and non-`text/html` responses pass through
+untouched, so it is safe in front of a mixed JSON / HTML application.
 
 ## Tests
 
 ```sh
 composer install
 vendor/bin/phpunit
+
+# line coverage + floor enforcement (needs pcov or xdebug)
+make coverage
 ```
 
 ## License
