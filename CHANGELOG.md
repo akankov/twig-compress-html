@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Brings the Symfony bundle to feature parity with the Laravel binding.
+
+### Added
+
+- **Full config parity.** The bundle now exposes every `MinifierOptions`
+  option (the 26 boolean toggles plus the five list options `local_domains`,
+  `special_html_comments_starting_with`, `special_html_comments_ending_with`,
+  `special_script_tags`, `template_logic_syntax_in_special_script_tags`),
+  matching the Laravel binding's `config/htmlmin.php`. Previously only seven
+  booleans were configurable.
+- **Opt-in response minification.** A new `minify_responses: true` flag
+  registers a `kernel.response` listener (`Http\MinifyHtmlResponseListener`)
+  that minifies whole `text/html` responses, mirroring the Laravel binding's
+  `MinifyHtmlResponseMiddleware`. Off by default; sub-requests, streamed, and
+  non-`text/html` responses pass through untouched.
+- **Line-coverage CI gate.** A `make coverage` target and a CI coverage job
+  (pcov) enforce a floor via `bin/coverage-check.php`, matching the Laravel
+  binding's quality bar.
+
+### Changed
+
+- The bundle builds a `MinifierOptions` and injects it into `HtmlMin` instead of
+  chaining individual `do*()` setters, so a future engine option only needs its
+  key added to one list — the binding no longer duplicates engine defaults.
+
 ## [1.2.0] — 2026-05-31
 
 Tracks the latest engine: requires `akankov/html-min` **^2.8** (was ^2.6). Since

@@ -24,6 +24,7 @@ return [
         'vendor/twig/twig/src',
         'vendor/symfony/config',
         'vendor/symfony/dependency-injection',
+        'vendor/symfony/http-foundation',
         'vendor/symfony/http-kernel',
     ],
     'exclude_analysis_directory_list' => [
