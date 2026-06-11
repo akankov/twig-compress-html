@@ -53,6 +53,7 @@ final class AkankovTwigCompressHtmlBundle extends AbstractBundle
         'keep_broken_html',
         'minify_inline_css',
         'minify_inline_js',
+        'remove_omitted_html_start_tags',
     ];
 
     /**
