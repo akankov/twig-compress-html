@@ -138,6 +138,25 @@ final class AkankovTwigCompressHtmlBundleTest extends TestCase
     }
 
     /**
+     * `remove_omitted_html_start_tags` arrived with engine v2.9.0 and is the
+     * first option added after the bundle reached full parity. Setting it
+     * `true` and seeing the `<html>`/`<head>`/`<body>` start tags disappear
+     * proves the key is wired through to MinifierOptions.
+     */
+    public function testStartTagOmissionOptionIsHonored(): void
+    {
+        $twig = $this->bootTwig(['remove_omitted_html_start_tags' => true]);
+        $rendered = $twig->createTemplate(
+            '{% htmlmin %}<html><head><title>t</title></head><body><p>x</p></body></html>{% endhtmlmin %}',
+        )->render();
+
+        self::assertStringNotContainsString('<body>', $rendered);
+        self::assertStringNotContainsString('<html>', $rendered);
+        self::assertStringContainsString('<title>t</title>', $rendered);
+        self::assertStringContainsString('<p>x', $rendered);
+    }
+
+    /**
      * Safety net for the camelize() -> named-argument contract: an invalid
      * MinifierOptions argument name would make the container fail to compile.
      * Setting every exposed option (booleans + list values) at once asserts the
