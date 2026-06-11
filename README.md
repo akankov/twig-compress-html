@@ -1,3 +1,9 @@
+[![CI](https://github.com/akankov/twig-compress-html/actions/workflows/ci.yml/badge.svg)](https://github.com/akankov/twig-compress-html/actions/workflows/ci.yml)
+[![Latest Stable Version](http://poser.pugx.org/akankov/twig-compress-html/v)](https://packagist.org/packages/akankov/twig-compress-html)
+[![Monthly Downloads](http://poser.pugx.org/akankov/twig-compress-html/d/monthly)](https://packagist.org/packages/akankov/twig-compress-html)
+[![Dependents](http://poser.pugx.org/akankov/twig-compress-html/dependents)](https://packagist.org/packages/akankov/twig-compress-html)
+[![License](http://poser.pugx.org/akankov/twig-compress-html/license)](https://packagist.org/packages/akankov/twig-compress-html)
+
 # twig-compress-html
 
 A Twig 3 extension wrapping [`akankov/html-min`](https://packagist.org/packages/akankov/html-min) — exposes an `html_min` filter and an `{% htmlmin %}...{% endhtmlmin %}` block tag, with an optional Symfony bundle for auto-registration.
@@ -6,7 +12,7 @@ A Twig 3 extension wrapping [`akankov/html-min`](https://packagist.org/packages/
 
 - PHP `8.3.* || 8.4.* || 8.5.*`
 - `twig/twig` `^3.0`
-- `akankov/html-min` `^2.8`
+- `akankov/html-min` `^2.9`
 
 ## Install
 
@@ -89,7 +95,7 @@ sum_up_whitespace: true     # → MinifierOptions::$sumUpWhitespace
 local_domains: ['a.test']   # → MinifierOptions::$localDomains
 ```
 
-All of the engine's options are accepted — the 26 boolean toggles plus the list
+All of the engine's options are accepted — the 27 boolean toggles plus the list
 options `local_domains`, `special_html_comments_starting_with`,
 `special_html_comments_ending_with`, `special_script_tags`, and
 `template_logic_syntax_in_special_script_tags`. Any key you omit falls through
@@ -111,6 +117,10 @@ akankov_twig_compress_html:
 
 Sub-requests, streamed responses, and non-`text/html` responses pass through
 untouched, so it is safe in front of a mixed JSON / HTML application.
+
+## Versioning
+
+This package follows [Semantic Versioning](https://semver.org/). From **1.0.0** onward the public surface — the `html_min` filter, the `{% htmlmin %}` block tag, the Symfony bundle's config keys, and the opt-in response listener — is stable; breaking changes are reserved for a new major version. The underlying engine is tracked via a caret constraint (`akankov/html-min: ^2.9`), so it picks up engine minor/patch releases automatically.
 
 ## Tests
 
