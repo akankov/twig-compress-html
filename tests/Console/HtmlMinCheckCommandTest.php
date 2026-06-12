@@ -37,6 +37,20 @@ final class HtmlMinCheckCommandTest extends TestCase
         self::assertStringContainsString('Cannot read input file', $tester->getDisplay());
     }
 
+    public function testMegabyteFormatting(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'twig-htmlmin-mb');
+        self::assertNotFalse($path);
+        // > 1 MiB so the MB branch of the byte formatter is exercised.
+        file_put_contents($path, '<p>' . str_repeat('lorem ipsum  dolor ', 61000) . '</p>');
+
+        $tester = new CommandTester(new HtmlMinCheckCommand(new HtmlMin()));
+        $exit = $tester->execute(['file' => $path]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertStringContainsString('MB', $tester->getDisplay());
+    }
+
     public function testKilobyteAndPercentFormatting(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'twig-htmlmin-kb');

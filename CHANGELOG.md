@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Line-coverage floor raised 90 → 100** (`MIN_LINE_COVERAGE` in the
+  Makefile), reaching parity with the Laravel binding's gate.
+- **README: streamed/206/ESI pass-through guidance.** Documents precisely
+  what the opt-in response listener skips and why.
+
 ### Added
 
 - **`html-min:check` console command.** With `symfony/console` installed

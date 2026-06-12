@@ -6,7 +6,7 @@ COMPOSER ?= composer
 # Line-coverage floor enforced by `make coverage`. Conservative starting value:
 # raise toward 100 (parity with the Laravel binding) once the CI run — the only
 # place a coverage driver is guaranteed — reports the real measured number.
-MIN_LINE_COVERAGE := 90
+MIN_LINE_COVERAGE := 100
 
 .PHONY: help install update outdated test coverage phpstan phan cs cs-check rector rector-check quality ci clean
 
