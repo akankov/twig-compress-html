@@ -6,10 +6,12 @@ namespace Akankov\TwigCompressHtml\Bundle;
 
 use Akankov\HtmlMin\Config\MinifierOptions;
 use Akankov\HtmlMin\HtmlMin;
+use Akankov\TwigCompressHtml\Console\HtmlMinCheckCommand;
 use Akankov\TwigCompressHtml\HtmlMinExtension;
 use Akankov\TwigCompressHtml\HtmlMinRuntime;
 use Akankov\TwigCompressHtml\Http\MinifyHtmlResponseListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -113,6 +115,15 @@ final class AkankovTwigCompressHtmlBundle extends AbstractBundle
 
         $services->set(HtmlMinExtension::class)
             ->tag('twig.extension');
+
+        // Registered only when symfony/console is installed — the component
+        // is a `suggest`, and an app without a console has no use for the
+        // command (nor the AddConsoleCommandPass that would reflect on it).
+        if (class_exists(Command::class)) {
+            $services->set(HtmlMinCheckCommand::class)
+                ->args([service(HtmlMin::class)])
+                ->tag('console.command');
+        }
 
         if ($config['minify_responses'] ?? false) {
             $services->set(MinifyHtmlResponseListener::class)

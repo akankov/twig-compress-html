@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`html-min:check` console command.** With `symfony/console` installed
+  (new `suggest`; the bundle only registers the command when the component
+  is present), `bin/console html-min:check FILE` minifies the file in
+  memory and reports the byte savings without writing to disk — parity
+  with the Laravel binding's Artisan command, same single-read error
+  handling and exit codes.
+
 - **`remove_omitted_html_start_tags` config key.** Exposes engine v2.9.0's
   opt-in `<html>`/`<head>`/`<body>` start-tag omission
   (`MinifierOptions::$removeOmittedHtmlStartTags`). Off by default, matching

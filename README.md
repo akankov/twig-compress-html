@@ -118,6 +118,20 @@ akankov_twig_compress_html:
 Sub-requests, streamed responses, and non-`text/html` responses pass through
 untouched, so it is safe in front of a mixed JSON / HTML application.
 
+### Console command
+
+With `symfony/console` installed, the bundle registers `html-min:check` — a
+CI/dev smoke-check that minifies a file in memory and reports the byte
+savings without writing to disk (mirrors the Laravel binding's Artisan
+command):
+
+```sh
+bin/console html-min:check templates/page.html
+# [OK] Reduced from 4.2 KB to 3.1 KB (-26.3%)
+```
+
+It exits `0` on success and `1` if the file cannot be read.
+
 ## Versioning
 
 This package follows [Semantic Versioning](https://semver.org/). From **1.0.0** onward the public surface — the `html_min` filter, the `{% htmlmin %}` block tag, the Symfony bundle's config keys, and the opt-in response listener — is stable; breaking changes are reserved for a new major version. The underlying engine is tracked via a caret constraint (`akankov/html-min: ^2.9`), so it picks up engine minor/patch releases automatically.

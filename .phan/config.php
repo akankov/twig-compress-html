@@ -23,6 +23,7 @@ return [
         'vendor/akankov/html-min/src',
         'vendor/twig/twig/src',
         'vendor/symfony/config',
+        'vendor/symfony/console',
         'vendor/symfony/dependency-injection',
         'vendor/symfony/http-foundation',
         'vendor/symfony/http-kernel',
