@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Akankov\TwigCompressHtml\Tests\Bundle;
 
 use Akankov\TwigCompressHtml\Bundle\AkankovTwigCompressHtmlBundle;
+use Akankov\TwigCompressHtml\Console\HtmlMinCheckCommand;
 use Override;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -76,6 +77,14 @@ final class AkankovTwigCompressHtmlBundleTest extends TestCase
     {
         $twig = $this->bootTwig([]);
         self::assertNotNull($twig->getFilter('html_min'));
+    }
+
+    public function testCheckCommandIsRegistered(): void
+    {
+        $command = $this->bootContainer([])->get(HtmlMinCheckCommand::class);
+
+        self::assertInstanceOf(HtmlMinCheckCommand::class, $command);
+        self::assertSame('html-min:check', $command->getName());
     }
 
     public function testRemoveCommentsTrueStripsComments(): void
