@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-06-12
+
+Engine v2.9 option parity, the html-min:check console command, and a
+100% line-coverage gate. No breaking changes.
+
 ### Changed
 
 - **Line-coverage floor raised 90 → 100** (`MIN_LINE_COVERAGE` in the
