@@ -118,6 +118,20 @@ akankov_twig_compress_html:
 Sub-requests, streamed responses, and non-`text/html` responses pass through
 untouched, so it is safe in front of a mixed JSON / HTML application.
 
+What "pass through" covers, precisely:
+
+- **Streamed responses** (`StreamedResponse`, `BinaryFileResponse`) are never
+  buffered or minified — the listener only touches responses whose body it
+  can read as a string.
+- **Partial content** (`206` responses to range requests) is skipped by the
+  same mechanism in practice — range responses are produced as binary-file
+  responses; minifying a byte range of HTML would corrupt it.
+- **ESI/SSI fragments**: the listener runs only on the main request, so
+  edge-side includes assembled by a proxy are minified per-fragment only if
+  your proxy requests them as main requests against this app — in that case
+  each fragment is valid standalone HTML and minifies safely. Fragments
+  rendered as Symfony sub-requests pass through untouched.
+
 ### Console command
 
 With `symfony/console` installed, the bundle registers `html-min:check` — a
