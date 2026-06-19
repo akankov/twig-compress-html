@@ -8,7 +8,13 @@ COMPOSER ?= composer
 # place a coverage driver is guaranteed — reports the real measured number.
 MIN_LINE_COVERAGE := 100
 
-.PHONY: help install update outdated test coverage phpstan phan cs cs-check rector rector-check quality ci clean
+# Mutation Score Indicator floors enforced by `make infection` (needs a coverage
+# driver). Measured MSI is ~75% (parity with html-min); the floor starts a few
+# points below to absorb timeout jitter and ratchets up as the suite hardens.
+MIN_MSI         := 70
+MIN_COVERED_MSI := 70
+
+.PHONY: help install update outdated test coverage infection phpstan phan cs cs-check rector rector-check quality ci clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage: make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -28,6 +34,9 @@ test: ## Run phpunit
 coverage: ## Run phpunit with line coverage and enforce the floor (needs pcov or xdebug)
 	$(PHP) -d pcov.enabled=1 vendor/bin/phpunit --coverage-clover build/coverage/clover.xml --coverage-text --only-summary-for-coverage-text
 	$(PHP) bin/coverage-check.php build/coverage/clover.xml $(MIN_LINE_COVERAGE)
+
+infection: ## Run mutation testing and enforce the MSI floor (needs pcov or xdebug)
+	$(PHP) -d pcov.enabled=1 vendor/bin/infection --threads=max --no-progress --min-msi=$(MIN_MSI) --min-covered-msi=$(MIN_COVERED_MSI)
 
 phpstan: ## Run phpstan at level max
 	$(PHP) vendor/bin/phpstan analyse --no-progress --memory-limit=512M

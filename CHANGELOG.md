@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] — 2026-06-19
+
+### Fixed
+
+- **Stale `Content-Length` after minification.** The opt-in `kernel.response`
+  listener shrinks the body via `setContent()` but left any pre-set
+  `Content-Length` header in place, which could truncate or over-read the
+  response downstream. The header is now removed after minifying so Symfony
+  re-derives the correct length.
+
+### Added
+
+- **Mutation testing.** An Infection config and a non-blocking `make infection`
+  gate (MSI floor 70, measured ~75%), matching the engine's setup.
+- **Supply-chain tooling.** A non-blocking `composer audit` CI job and a 7-day
+  new-release cooldown added to the existing Dependabot config.
+
 ## [1.4.0] — 2026-06-12
 
 Engine v2.9 option parity, the html-min:check console command, and a
