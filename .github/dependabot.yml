@@ -8,6 +8,10 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Berlin"
+    # Wait a week before proposing a newly published version — a freshly
+    # released (or compromised) package is the highest supply-chain risk window.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
@@ -34,6 +38,8 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - "dependencies"

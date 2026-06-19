@@ -45,6 +45,11 @@ final readonly class MinifyHtmlResponseListener
         }
 
         $response->setContent($this->minifier->minify((string) $response->getContent()));
+
+        // Minifying shrinks the body, so any Content-Length an upstream layer
+        // already set is now too large — clients would truncate or over-read the
+        // response. Drop it and let Symfony's prepare() re-derive the correct length.
+        $response->headers->remove('Content-Length');
     }
 
     private static function isHtml(?string $contentType): bool

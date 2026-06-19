@@ -43,6 +43,27 @@ final class MinifyHtmlResponseListenerTest extends TestCase
         self::assertStringNotContainsString('  ', (string) $response->getContent());
     }
 
+    public function testClearsStaleContentLengthAfterMinifying(): void
+    {
+        $body = '<html>  <body><!-- x -->hi</body>  </html>';
+        $response = new Response($body, 200, [
+            'Content-Type' => 'text/html',
+            'Content-Length' => (string) \strlen($body),
+        ]);
+
+        $this->dispatch($response);
+
+        $minified = (string) $response->getContent();
+        $contentLength = $response->headers->get('Content-Length');
+
+        // The old length must not survive: a stale Content-Length larger than the
+        // shrunken body makes clients truncate or over-read the response.
+        if ($contentLength !== null) {
+            self::assertSame((string) \strlen($minified), $contentLength);
+        }
+        self::assertNotSame((string) \strlen($body), $contentLength);
+    }
+
     public function testLeavesNonHtmlResponseUntouched(): void
     {
         $json = '{ "a":  1 }';
