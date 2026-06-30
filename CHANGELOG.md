@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2] — 2026-06-30
+
+### Security
+
+- **Raised the `twig/twig` floor to `^3.26`** to exclude the versions affected by
+  the June 2026 Twig advisories — most notably CVE-2026-46633 (critical, PHP code
+  injection via `{% use %}` template names) and CVE-2026-46640 (high, arbitrary
+  PHP code execution via `_self.(<string>)` macro references), plus several
+  high/medium sandbox-bypass CVEs, all fixed in Twig 3.26.0. The previous `^3.0`
+  constraint already *allowed* a patched Twig, but the higher floor guarantees no
+  consumer can resolve a vulnerable version. This binding does not use Twig's
+  sandbox, so the upgrade carries no behavioral change for its own code paths.
+
+### Changed
+
+- **Raised the `akankov/html-min` floor to `^2.11`** to document the engine
+  version this release is tested against (re-entrancy guard + `keepBrokenHtml`
+  CPU cap from html-min v2.11.0). `^2.9` already resolved v2.11.0; no API change.
+
 ## [1.4.1] — 2026-06-19
 
 ### Fixed

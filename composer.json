@@ -13,8 +13,8 @@
     ],
     "require": {
         "php": "8.3.* || 8.4.* || 8.5.*",
-        "akankov/html-min": "^2.9",
-        "twig/twig": "^3.0"
+        "akankov/html-min": "^2.11",
+        "twig/twig": "^3.26"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.65",
